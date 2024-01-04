@@ -10,6 +10,7 @@ on:
       - master
     paths:
       - 'packages/flutter/**'
+  workflow_dispatch:
 
 permissions: read-all
 
