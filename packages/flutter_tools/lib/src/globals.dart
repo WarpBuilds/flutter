@@ -27,6 +27,7 @@ import 'base/terminal.dart';
 import 'base/time.dart';
 import 'base/user_messages.dart';
 import 'build_system/build_system.dart';
+import 'build_system/build_targets.dart';
 import 'cache.dart';
 import 'custom_devices/custom_devices_config.dart';
 import 'device.dart';
@@ -40,6 +41,7 @@ import 'macos/cocoapods.dart';
 import 'macos/cocoapods_validator.dart';
 import 'macos/xcdevice.dart';
 import 'macos/xcode.dart';
+import 'native_assets.dart';
 import 'persistent_tool_state.dart';
 import 'pre_run_validator.dart';
 import 'project.dart';
@@ -54,6 +56,7 @@ import 'version.dart';
 
 Artifacts? get artifacts => context.get<Artifacts>();
 BuildSystem get buildSystem => context.get<BuildSystem>()!;
+BuildTargets get buildTargets => context.get<BuildTargets>()!;
 Cache get cache => context.get<Cache>()!;
 CocoaPodsValidator? get cocoapodsValidator => context.get<CocoaPodsValidator>();
 Config get config => context.get<Config>()!;
@@ -241,6 +244,7 @@ final AnsiTerminal _defaultAnsiTerminal = AnsiTerminal(
   stdio: stdio,
   platform: platform,
   now: DateTime.now(),
+  shutdownHooks: shutdownHooks,
 );
 
 /// The global Stdio wrapper.
@@ -302,3 +306,5 @@ NonNullSafeBuilds get nonNullSafeBuilds => context.get<NonNullSafeBuilds>() ?? N
 /// A value of [null] indicates that no installation of java could be found on
 /// the host machine.
 Java? get java => context.get<Java>();
+
+TestCompilerNativeAssetsBuilder? get nativeAssetsBuilder => context.get<TestCompilerNativeAssetsBuilder>();

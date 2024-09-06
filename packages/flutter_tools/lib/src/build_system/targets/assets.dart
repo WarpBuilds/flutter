@@ -4,18 +4,24 @@
 
 import 'package:pool/pool.dart';
 
+import '../../artifacts.dart';
 import '../../asset.dart';
+import '../../base/common.dart';
 import '../../base/file_system.dart';
 import '../../base/logger.dart';
 import '../../build_info.dart';
 import '../../convert.dart';
+import '../../dart/package_map.dart';
 import '../../devfs.dart';
+import '../../flutter_manifest.dart';
 import '../build_system.dart';
 import '../depfile.dart';
+import '../exceptions.dart';
+import '../tools/asset_transformer.dart';
+import '../tools/scene_importer.dart';
+import '../tools/shader_compiler.dart';
 import 'common.dart';
 import 'icon_tree_shaker.dart';
-import 'scene_importer.dart';
-import 'shader_compiler.dart';
 
 /// A helper function to copy an asset bundle into an [environment]'s output
 /// directory.
@@ -31,8 +37,7 @@ Future<Depfile> copyAssets(
   Directory outputDirectory, {
   Map<String, DevFSContent> additionalContent = const <String, DevFSContent>{},
   required TargetPlatform targetPlatform,
-  BuildMode? buildMode,
-  required ShaderTarget shaderTarget,
+  required BuildMode buildMode,
   List<File> additionalInputs = const <File>[],
   String? flavor,
 }) async {
@@ -56,7 +61,7 @@ Future<Depfile> copyAssets(
   ).createBundle();
   final int resultCode = await assetBundle.build(
     manifestPath: pubspecFile.path,
-    packagesPath: environment.projectDir.childFile('.packages').path,
+    packageConfigPath: findPackageConfigFileOrDefault(environment.projectDir).path,
     deferredComponentsEnabled: environment.defines[kDeferredComponents] == 'true',
     targetPlatform: targetPlatform,
     flavor: flavor,
@@ -94,19 +99,30 @@ Future<Depfile> copyAssets(
     fileSystem: environment.fileSystem,
     artifacts: environment.artifacts,
   );
+  final AssetTransformer assetTransformer = AssetTransformer(
+    processManager: environment.processManager,
+    fileSystem: environment.fileSystem,
+    dartBinaryPath: environment.artifacts.getArtifactPath(Artifact.engineDartBinary),
+    buildMode: buildMode,
+  );
 
   final Map<String, AssetBundleEntry> assetEntries = <String, AssetBundleEntry>{
     ...assetBundle.entries,
     ...additionalContent.map((String key, DevFSContent value) {
       return MapEntry<String, AssetBundleEntry>(
         key,
-        AssetBundleEntry(value, kind: AssetKind.regular),
+        AssetBundleEntry(
+          value,
+          kind: AssetKind.regular,
+          transformers: const <AssetTransformerEntry>[],
+        ),
       );
     }),
     if (skslBundle != null)
       kSkSLShaderBundlePath: AssetBundleEntry(
         skslBundle,
         kind: AssetKind.regular,
+        transformers: const <AssetTransformerEntry>[],
       ),
   };
 
@@ -129,7 +145,20 @@ Future<Depfile> copyAssets(
           bool doCopy = true;
           switch (entry.value.kind) {
             case AssetKind.regular:
-              break;
+              if (entry.value.transformers.isNotEmpty) {
+                final AssetTransformationFailure? failure = await assetTransformer.transformAsset(
+                  asset: content.file as File,
+                  outputPath: file.path,
+                  workingDirectory: environment.projectDir.path,
+                  transformerEntries: entry.value.transformers,
+                  logger: environment.logger,
+                );
+                doCopy = false;
+                if (failure != null) {
+                  throwToolExit('User-defined transformation of asset "${entry.key}" failed.\n'
+                      '${failure.message}');
+                }
+              }
             case AssetKind.font:
               doCopy = !await iconTreeShaker.subsetFont(
                 input: content.file as File,
@@ -140,8 +169,7 @@ Future<Depfile> copyAssets(
               doCopy = !await shaderCompiler.compileShader(
                 input: content.file as File,
                 outputPath: file.path,
-                target: shaderTarget,
-                json: targetPlatform == TargetPlatform.web_javascript,
+                targetPlatform: targetPlatform,
               );
             case AssetKind.model:
               doCopy = !await sceneImporter.importScene(
@@ -163,7 +191,7 @@ Future<Depfile> copyAssets(
   // Copy deferred components assets only for release or profile builds.
   // The assets are included in assetBundle.entries as a normal asset when
   // building as debug.
-  if (environment.defines[kDeferredComponents] == 'true' && buildMode != null) {
+  if (environment.defines[kDeferredComponents] == 'true') {
     await Future.wait<void>(assetBundle.deferredComponentsEntries.entries.map<Future<void>>(
       (MapEntry<String, Map<String, AssetBundleEntry>> componentEntries) async {
         final Directory componentOutputDir =
@@ -320,6 +348,11 @@ class CopyAssets extends Target {
 
   @override
   Future<void> build(Environment environment) async {
+    final String? buildModeEnvironment = environment.defines[kBuildMode];
+    if (buildModeEnvironment == null) {
+      throw MissingDefineException(kBuildMode, name);
+    }
+    final BuildMode buildMode = BuildMode.fromCliName(buildModeEnvironment);
     final Directory output = environment
       .buildDir
       .childDirectory('flutter_assets');
@@ -328,7 +361,7 @@ class CopyAssets extends Target {
       environment,
       output,
       targetPlatform: TargetPlatform.android,
-      shaderTarget: ShaderTarget.sksl,
+      buildMode: buildMode,
       flavor: environment.defines[kFlavor],
     );
     environment.depFileService.writeToFile(

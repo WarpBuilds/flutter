@@ -2,6 +2,11 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+/// @docImport 'package:flutter/semantics.dart';
+///
+/// @docImport 'refresh_indicator.dart';
+library;
+
 import 'dart:math' as math;
 
 import 'package:flutter/cupertino.dart';
@@ -191,13 +196,10 @@ class _LinearProgressIndicatorPainter extends CustomPainter {
         return;
       }
 
-      final double left;
-      switch (textDirection) {
-        case TextDirection.rtl:
-          left = size.width - width - x;
-        case TextDirection.ltr:
-          left = x;
-      }
+      final double left = switch (textDirection) {
+        TextDirection.rtl => size.width - width - x,
+        TextDirection.ltr => x,
+      };
 
       final Rect rect = Offset(left, 0.0) & Size(width, size.height);
       if (indicatorBorderRadius != BorderRadius.zero) {
@@ -569,11 +571,11 @@ class CircularProgressIndicator extends ProgressIndicator {
   }) : _indicatorType = _ActivityIndicatorType.material;
 
   /// Creates an adaptive progress indicator that is a
-  /// [CupertinoActivityIndicator] in iOS and [CircularProgressIndicator] in
-  /// material theme/non-iOS.
+  /// [CupertinoActivityIndicator] in [TargetPlatform.iOS] & [TargetPlatform.macOS] and [CircularProgressIndicator] in
+  /// material theme/non-Apple platforms.
   ///
   /// The [value], [valueColor], [strokeWidth], [semanticsLabel], and
-  /// [semanticsValue] will be ignored in iOS.
+  /// [semanticsValue] will be ignored in iOS & macOS.
   ///
   /// {@macro flutter.material.ProgressIndicator.ProgressIndicator}
   const CircularProgressIndicator.adaptive({
@@ -1077,6 +1079,9 @@ class _CircularProgressIndicatorDefaultsM3 extends ProgressIndicatorThemeData {
 
   @override
   Color get color => _colors.primary;
+
+  @override
+  Color get circularTrackColor => _colors.secondaryContainer;
 }
 
 class _LinearProgressIndicatorDefaultsM3 extends ProgressIndicatorThemeData {
@@ -1089,7 +1094,7 @@ class _LinearProgressIndicatorDefaultsM3 extends ProgressIndicatorThemeData {
   Color get color => _colors.primary;
 
   @override
-  Color get linearTrackColor => _colors.surfaceVariant;
+  Color get linearTrackColor => _colors.secondaryContainer;
 
   @override
   double get linearMinHeight => 4.0;

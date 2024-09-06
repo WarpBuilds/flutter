@@ -8,7 +8,7 @@ import 'package:flutter_tools/src/base/io.dart';
 import 'package:flutter_tools/src/build_info.dart';
 import 'package:flutter_tools/src/device.dart';
 import 'package:flutter_tools/src/test/flutter_platform.dart';
-import 'package:test_core/backend.dart'; // ignore: deprecated_member_use
+import 'package:test_core/backend.dart';
 
 import '../src/common.dart';
 import '../src/context.dart';
@@ -102,7 +102,6 @@ void main() {
         platformPluginRegistration: (FlutterPlatform platform) {
           capturedPlatform = platform;
         },
-        uriConverter: (String input) => '$input/test',
       );
 
       expect(identical(capturedPlatform, flutterPlatform), equals(true));
@@ -119,7 +118,43 @@ void main() {
       expect(flutterPlatform.updateGoldens, equals(true));
       expect(flutterPlatform.testAssetDirectory, '/build/test');
       expect(flutterPlatform.icudtlPath, equals('ghi'));
-      expect(flutterPlatform.uriConverter?.call('hello'), 'hello/test');
+    });
+  });
+
+  group('generateTestBootstrap', () {
+    group('writes a "const packageConfigLocation" string', () {
+      test('with null packageConfigUri', () {
+        final String contents = generateTestBootstrap(
+          testUrl:
+              Uri.parse('file:///Users/me/some_package/test/some_test.dart'),
+          host: InternetAddress('127.0.0.1', type: InternetAddressType.IPv4),
+        );
+        // IMPORTANT: DO NOT RENAME, REMOVE, OR MODIFY THE
+        // 'const packageConfigLocation' VARIABLE.
+        // Dash tooling like Dart DevTools performs an evaluation on this variable
+        // at runtime to get the package config location for Flutter test targets.
+        expect(contents, contains("const packageConfigLocation = 'null';"));
+      });
+
+      test('with non-null packageConfigUri', () {
+        final String contents = generateTestBootstrap(
+          testUrl:
+              Uri.parse('file:///Users/me/some_package/test/some_test.dart'),
+          host: InternetAddress('127.0.0.1', type: InternetAddressType.IPv4),
+          packageConfigUri: Uri.parse(
+              'file:///Users/me/some_package/.dart_tool/package_config.json'),
+        );
+        // IMPORTANT: DO NOT RENAME, REMOVE, OR MODIFY THE
+        // 'const packageConfigLocation' VARIABLE.
+        // Dash tooling like Dart DevTools performs an evaluation on this variable
+        // at runtime to get the package config location for Flutter test targets.
+        expect(
+          contents,
+          contains(
+            "const packageConfigLocation = 'file:///Users/me/some_package/.dart_tool/package_config.json';",
+          ),
+        );
+      });
     });
   });
 }

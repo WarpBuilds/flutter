@@ -44,6 +44,13 @@ DefaultTextStyle getLabelStyle(WidgetTester tester) {
   );
 }
 
+TextStyle? getIconStyle(WidgetTester tester, IconData icon) {
+  final RichText iconRichText = tester.widget<RichText>(
+    find.descendant(of: find.byIcon(icon).first, matching: find.byType(RichText)),
+  );
+  return iconRichText.text.style;
+}
+
 void main() {
   test('ChipThemeData copyWith, ==, hashCode basics', () {
     expect(const ChipThemeData(), const ChipThemeData().copyWith());
@@ -79,6 +86,8 @@ void main() {
     expect(themeData.elevation, null);
     expect(themeData.pressElevation, null);
     expect(themeData.iconTheme, null);
+    expect(themeData.avatarBoxConstraints, null);
+    expect(themeData.deleteIconBoxConstraints, null);
   });
 
   testWidgets('Default ChipThemeData debugFillProperties', (WidgetTester tester) async {
@@ -117,6 +126,8 @@ void main() {
       elevation: 5,
       pressElevation: 6,
       iconTheme: IconThemeData(color: Color(0xffffff10)),
+      avatarBoxConstraints: BoxConstraints.tightForFinite(),
+      deleteIconBoxConstraints: BoxConstraints.tightForFinite(),
     ).debugFillProperties(builder);
 
     final List<String> description = builder.properties
@@ -125,7 +136,7 @@ void main() {
         .toList();
 
     expect(description, equalsIgnoringHashCodes(<String>[
-      'color: MaterialStatePropertyAll(Color(0xfffffff0))',
+      'color: WidgetStatePropertyAll(Color(0xfffffff0))',
       'backgroundColor: Color(0xfffffff1)',
       'deleteIconColor: Color(0xfffffff2)',
       'disabledColor: Color(0xfffffff3)',
@@ -145,7 +156,9 @@ void main() {
       'brightness: dark',
       'elevation: 5.0',
       'pressElevation: 6.0',
-      'iconTheme: IconThemeData#00000(color: Color(0xffffff10))'
+      'iconTheme: IconThemeData#00000(color: Color(0xffffff10))',
+      'avatarBoxConstraints: BoxConstraints(unconstrained)',
+      'deleteIconBoxConstraints: BoxConstraints(unconstrained)',
     ]));
   });
 
@@ -185,7 +198,7 @@ void main() {
     expect(tester.getSize(find.byType(RawChip)), const Size(402, 252)); // label + padding + labelPadding
     expect(
       getMaterial(tester).shape,
-      chipTheme.shape?.copyWith(side: BorderSide(color: theme.colorScheme.outline)),
+      chipTheme.shape?.copyWith(side: BorderSide(color: theme.colorScheme.outlineVariant)),
     );
     expect(getLabelStyle(tester).style.fontSize, 32);
     expect(getIconData(tester).color, chipTheme.iconTheme!.color);
@@ -272,7 +285,7 @@ void main() {
     expect(getMaterial(tester).elevation, chipTheme.elevation);
     expect(
       getMaterial(tester).shape,
-      chipTheme.shape?.copyWith(side: BorderSide(color: theme.colorScheme.outline)),
+      chipTheme.shape?.copyWith(side: BorderSide(color: theme.colorScheme.outlineVariant)),
     );
     expect(getLabelStyle(tester).style.fontSize, 32);
     expect(getIconData(tester).color, chipTheme.iconTheme!.color);
@@ -600,6 +613,7 @@ void main() {
       selectedShadowColor: Colors.black,
       showCheckmark: false,
       checkmarkColor: Colors.black,
+      iconTheme: const IconThemeData(size: 26.0),
     );
     final ChipThemeData chipThemeWhite = ChipThemeData.fromDefaults(
       secondaryColor: Colors.white,
@@ -617,6 +631,7 @@ void main() {
       selectedShadowColor: Colors.white,
       showCheckmark: true,
       checkmarkColor: Colors.white,
+      iconTheme: const IconThemeData(size: 22.0),
     );
 
     final ChipThemeData lerp = ChipThemeData.lerp(chipThemeBlack, chipThemeWhite, 0.5)!;
@@ -640,7 +655,7 @@ void main() {
     expect(lerp.elevation, 3.0);
     expect(lerp.pressElevation, 7.0);
     expect(lerp.checkmarkColor, equals(middleGrey));
-    expect(lerp.iconTheme, isNull);
+    expect(lerp.iconTheme, const IconThemeData(size: 24.0));
 
     expect(ChipThemeData.lerp(null, null, 0.25), isNull);
 
@@ -664,7 +679,7 @@ void main() {
     expect(lerpANull25.elevation, 1.25);
     expect(lerpANull25.pressElevation, 2.5);
     expect(lerpANull25.checkmarkColor, equals(Colors.white.withAlpha(0x40)));
-    expect(lerp.iconTheme, isNull);
+    expect(lerpANull25.iconTheme, const IconThemeData(size: 5.5));
 
     final ChipThemeData lerpANull75 = ChipThemeData.lerp(null, chipThemeWhite, 0.75)!;
     expect(lerpANull75.backgroundColor, equals(Colors.black.withAlpha(0x17)));
@@ -686,6 +701,7 @@ void main() {
     expect(lerpANull75.elevation, 3.75);
     expect(lerpANull75.pressElevation, 7.5);
     expect(lerpANull75.checkmarkColor, equals(Colors.white.withAlpha(0xbf)));
+    expect(lerpANull75.iconTheme, const IconThemeData(size: 16.5));
 
     final ChipThemeData lerpBNull25 = ChipThemeData.lerp(chipThemeBlack, null, 0.25)!;
     expect(lerpBNull25.backgroundColor, equals(Colors.white.withAlpha(0x17)));
@@ -707,7 +723,7 @@ void main() {
     expect(lerpBNull25.elevation, 0.75);
     expect(lerpBNull25.pressElevation, 3.0);
     expect(lerpBNull25.checkmarkColor, equals(Colors.black.withAlpha(0xbf)));
-    expect(lerp.iconTheme, isNull);
+    expect(lerpBNull25.iconTheme, const IconThemeData(size: 19.5));
 
     final ChipThemeData lerpBNull75 = ChipThemeData.lerp(chipThemeBlack, null, 0.75)!;
     expect(lerpBNull75.backgroundColor, equals(Colors.white.withAlpha(0x08)));
@@ -729,7 +745,7 @@ void main() {
     expect(lerpBNull75.elevation, 0.25);
     expect(lerpBNull75.pressElevation, 1.0);
     expect(lerpBNull75.checkmarkColor, equals(Colors.black.withAlpha(0x40)));
-    expect(lerp.iconTheme, isNull);
+    expect(lerpBNull75.iconTheme, const IconThemeData(size: 6.5));
   });
 
   testWidgets('Chip uses stateful color from chip theme', (WidgetTester tester) async {
@@ -1313,6 +1329,200 @@ void main() {
 
     expect(getIconData(tester).size, 23.0);
     expect(getIconData(tester).color, const Color(0xff112233));
+  });
+
+  testWidgets('ChipThemeData.avatarBoxConstraints updates avatar size constraints', (WidgetTester tester) async {
+    const double border = 1.0;
+    const double iconSize = 18.0;
+    const double labelPadding = 8.0;
+    const double padding = 8.0;
+    const Size labelSize = Size(75, 75);
+
+    // Test default avatar layout constraints.
+    await tester.pumpWidget(MaterialApp(
+      theme: ThemeData(chipTheme: const ChipThemeData(
+        avatarBoxConstraints: BoxConstraints.tightForFinite(),
+      )),
+      home: Material(
+        child: Center(
+          child: RawChip(
+            avatar: const Icon(Icons.favorite),
+            label: Container(
+              width: labelSize.width,
+              height: labelSize.width,
+              color: const Color(0xFFFF0000),
+            ),
+          ),
+        ),
+      ),
+    ));
+
+    expect(tester.getSize(find.byType(RawChip)).width, equals(127.0));
+    expect(tester.getSize(find.byType(RawChip)).height, equals(93.0));
+
+    // Calculate the distance between avatar and chip edges.
+    final Offset chipTopLeft = tester.getTopLeft(find.byWidget(getMaterial(tester)));
+    final Offset avatarCenter = tester.getCenter(find.byIcon(Icons.favorite));
+    expect(chipTopLeft.dx, avatarCenter.dx - (iconSize / 2) - padding - border);
+    expect(chipTopLeft.dy, avatarCenter.dy - (labelSize.width / 2) - padding - border);
+
+    // Calculate the distance between avatar and label.
+    final Offset labelTopLeft = tester.getTopLeft(find.byType(Container));
+    expect(labelTopLeft.dx, avatarCenter.dx + (iconSize / 2) + labelPadding);
+  });
+
+  testWidgets('ChipThemeData.deleteIconBoxConstraints updates delete icon size constraints', (WidgetTester tester) async {
+    const double border = 1.0;
+    const double iconSize = 18.0;
+    const double labelPadding = 8.0;
+    const double padding = 8.0;
+    const Size labelSize = Size(75, 75);
+
+    // Test custom delete layout constraints.
+    await tester.pumpWidget(MaterialApp(
+      theme: ThemeData(chipTheme: const ChipThemeData(
+        deleteIconBoxConstraints: BoxConstraints.tightForFinite(),
+      )),
+      home: Material(
+        child: Center(
+          child: RawChip(
+            onDeleted: () { },
+            label: Container(
+              width: labelSize.width,
+              height: labelSize.width,
+              color: const Color(0xFFFF0000),
+            ),
+          ),
+        ),
+      ),
+    ));
+
+    expect(tester.getSize(find.byType(RawChip)).width, equals(127.0));
+    expect(tester.getSize(find.byType(RawChip)).height, equals(93.0));
+
+    // Calculate the distance between delete icon and chip edges.
+    final Offset chipTopRight = tester.getTopRight(find.byWidget(getMaterial(tester)));
+    final Offset deleteIconCenter = tester.getCenter(find.byIcon(Icons.cancel));
+    expect(chipTopRight.dx, deleteIconCenter.dx + (iconSize / 2) + padding + border);
+    expect(chipTopRight.dy, deleteIconCenter.dy - (labelSize.width / 2) - padding - border);
+
+    // Calculate the distance between delete icon and label.
+    final Offset labelTopRight = tester.getTopRight(find.byType(Container));
+    expect(labelTopRight.dx, deleteIconCenter.dx - (iconSize / 2) - labelPadding);
+  });
+
+  testWidgets('ChipThemeData.iconTheme updates avatar and delete icons', (WidgetTester tester) async {
+    const Color iconColor = Color(0xffff0000);
+    const double iconSize = 32.0;
+    const IconData avatarIcon = Icons.favorite;
+    const IconData deleteIcon = Icons.delete;
+
+    await tester.pumpWidget(MaterialApp(
+      theme: ThemeData(chipTheme: const ChipThemeData(
+        iconTheme: IconThemeData(
+          color: iconColor,
+          size: iconSize,
+        ),
+      )),
+      home: Material(
+        child: Center(
+          child: RawChip(
+            avatar: const Icon(Icons.favorite),
+            deleteIcon: const Icon(Icons.delete),
+            onDeleted: () { },
+            label: const SizedBox(height: 100),
+          ),
+        ),
+      ),
+    ));
+
+    // Test rendered icon size.
+    final RenderBox avatarIconBox = tester.renderObject(find.byIcon(avatarIcon));
+    final RenderBox deleteIconBox = tester.renderObject(find.byIcon(deleteIcon));
+    expect(avatarIconBox.size.width, equals(iconSize));
+    expect(deleteIconBox.size.width, equals(iconSize));
+
+    // Test rendered icon color.
+    expect(getIconStyle(tester, avatarIcon)?.color, iconColor);
+    expect(getIconStyle(tester, deleteIcon)?.color, iconColor);
+  });
+
+  testWidgets('ChipThemeData.deleteIconColor overrides ChipThemeData.iconTheme color', (WidgetTester tester) async {
+    const Color iconColor = Color(0xffff00ff);
+    const Color deleteIconColor = Color(0xffff00ff);
+    const IconData deleteIcon = Icons.delete;
+
+    Widget buildChip({ Color? deleteIconColor, Color? iconColor }) {
+      return MaterialApp(
+        theme: ThemeData(
+          chipTheme: ChipThemeData(
+            deleteIconColor: deleteIconColor,
+            iconTheme: IconThemeData(color: iconColor),
+          )
+        ),
+        home: Material(
+          child: Center(
+            child: RawChip(
+              deleteIcon: const Icon(Icons.delete),
+              onDeleted: () { },
+              label: const SizedBox(height: 100),
+            ),
+          ),
+        ),
+      );
+    }
+
+    await tester.pumpWidget(buildChip(iconColor: iconColor));
+
+    // Test rendered icon color.
+    expect(getIconStyle(tester, deleteIcon)?.color, iconColor);
+
+    await tester.pumpWidget(buildChip(
+      deleteIconColor: deleteIconColor,
+      iconColor: iconColor,
+    ));
+
+    // Test rendered icon color.
+    expect(getIconStyle(tester, deleteIcon)?.color, deleteIconColor);
+  });
+
+   // This is a regression test for https://github.com/flutter/flutter/issues/135136.
+  testWidgets('MaterialStateBorderSide properly lerp in ChipThemeData.side', (WidgetTester tester) async {
+    late ColorScheme colorScheme;
+
+    Widget buildChip({ required  Color seedColor }) {
+      colorScheme = ColorScheme.fromSeed(seedColor: seedColor);
+      return MaterialApp(
+        theme: ThemeData(
+          colorScheme: colorScheme,
+          chipTheme: ChipThemeData(
+            side: MaterialStateBorderSide.resolveWith((Set<MaterialState> states) {
+              return BorderSide(
+                color: colorScheme.primary,
+                width: 4.0,
+              );
+            }),
+          ),
+        ),
+        home: const Scaffold(
+          body: RawChip(label: Text('Chip')),
+        ),
+      );
+    }
+
+    await tester.pumpWidget(buildChip(seedColor: Colors.red));
+    await tester.pumpAndSettle();
+
+    RenderBox getChipRenderBox() {
+      return tester.renderObject<RenderBox>(find.byType(RawChip));
+    }
+
+    expect(getChipRenderBox(), paints..drrect(color: colorScheme.primary));
+
+    await tester.pumpWidget(buildChip(seedColor: Colors.blue));
+    await tester.pump(kPressTimeout);
+
+    expect(getChipRenderBox(), paints..drrect(color: colorScheme.primary));
   });
 }
 

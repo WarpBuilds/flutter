@@ -5,6 +5,7 @@
 apply plugin: 'com.android.application'
 
 android {
+    namespace = "io.flutter.add2app"
     compileSdk 34
 
     compileOptions {
@@ -15,7 +16,7 @@ android {
     defaultConfig {
         applicationId "io.flutter.add2app"
         minSdkVersion 21
-        targetSdkVersion 33
+        targetSdkVersion 34
         versionCode 1
         versionName "1.0"
     }

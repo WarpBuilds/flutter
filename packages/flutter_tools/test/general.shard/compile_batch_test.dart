@@ -54,7 +54,6 @@ void main() {
       processManager: FakeProcessManager.list(<FakeCommand>[
         FakeCommand(command: const <String>[
           'Artifact.engineDartAotRuntime',
-          '--disable-dart-dev',
           'Artifact.frontendServerSnapshotForEngineDartSdk',
           '--sdk-root',
           '/path/to/sdkroot/',
@@ -100,7 +99,6 @@ void main() {
       processManager: FakeProcessManager.list(<FakeCommand>[
         FakeCommand(command: const <String>[
           'Artifact.engineDartAotRuntime',
-          '--disable-dart-dev',
           'Artifact.frontendServerSnapshotForEngineDartSdk',
           '--sdk-root',
           '/path/to/sdkroot/',
@@ -146,7 +144,6 @@ void main() {
       processManager: FakeProcessManager.list(<FakeCommand>[
         FakeCommand(command: const <String>[
           'Artifact.engineDartAotRuntime',
-          '--disable-dart-dev',
           'Artifact.frontendServerSnapshotForEngineDartSdk',
           '--sdk-root',
           '/path/to/sdkroot/',
@@ -192,7 +189,6 @@ void main() {
       processManager: FakeProcessManager.list(<FakeCommand>[
         FakeCommand(command: const <String>[
           'Artifact.engineDartAotRuntime',
-          '--disable-dart-dev',
           'Artifact.frontendServerSnapshotForEngineDartSdk',
           '--sdk-root',
           '/path/to/sdkroot/',
@@ -200,6 +196,8 @@ void main() {
           '--no-print-incremental-dependencies',
           '-Ddart.vm.profile=true',
           '-Ddart.vm.product=false',
+          '--delete-tostring-package-uri=dart:ui',
+          '--delete-tostring-package-uri=package:flutter',
           '--no-link-platform',
           '--aot',
           '--tfa',
@@ -240,7 +238,6 @@ void main() {
       processManager: FakeProcessManager.list(<FakeCommand>[
         FakeCommand(command: const <String>[
           'Artifact.engineDartAotRuntime',
-          '--disable-dart-dev',
           'Artifact.frontendServerSnapshotForEngineDartSdk',
           '--sdk-root',
           '/path/to/sdkroot/',
@@ -248,6 +245,8 @@ void main() {
           '--no-print-incremental-dependencies',
           '-Ddart.vm.profile=false',
           '-Ddart.vm.product=true',
+          '--delete-tostring-package-uri=dart:ui',
+          '--delete-tostring-package-uri=package:flutter',
           '--no-link-platform',
           '--aot',
           '--tfa',
@@ -288,7 +287,6 @@ void main() {
       processManager: FakeProcessManager.list(<FakeCommand>[
         FakeCommand(command: const <String>[
           'Artifact.engineDartAotRuntime',
-          '--disable-dart-dev',
           'Artifact.frontendServerSnapshotForEngineDartSdk',
           '--sdk-root',
           '/path/to/sdkroot/',
@@ -340,7 +338,6 @@ void main() {
       processManager: FakeProcessManager.list(<FakeCommand>[
         FakeCommand(command: const <String>[
           'Artifact.engineDartAotRuntime',
-          '--disable-dart-dev',
           'Artifact.frontendServerSnapshotForEngineDartSdk',
           '--sdk-root',
           '/path/to/sdkroot/',
@@ -390,7 +387,6 @@ void main() {
       processManager: FakeProcessManager.list(<FakeCommand>[
         FakeCommand(command: const <String>[
           'Artifact.engineDartAotRuntime',
-          '--disable-dart-dev',
           'Artifact.frontendServerSnapshotForEngineDartSdk',
           '--sdk-root',
           '/path/to/sdkroot/',
@@ -450,7 +446,6 @@ void main() {
       processManager: FakeProcessManager.list(<FakeCommand>[
         FakeCommand(command: const <String>[
           'Artifact.engineDartAotRuntime',
-          '--disable-dart-dev',
           'Artifact.frontendServerSnapshotForEngineDartSdk',
           '--sdk-root',
           '/path/to/sdkroot/',

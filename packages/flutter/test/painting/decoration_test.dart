@@ -3,7 +3,7 @@
 // found in the LICENSE file.
 
 import 'dart:async';
-import 'dart:ui' as ui show ColorFilter, Image;
+import 'dart:ui' as ui show Color, ColorFilter, Image;
 
 import 'package:fake_async/fake_async.dart';
 import 'package:flutter/foundation.dart';
@@ -13,6 +13,36 @@ import 'package:flutter_test/flutter_test.dart';
 import '../image_data.dart';
 import '../painting/mocks_for_image_cache.dart';
 import '../rendering/rendering_tester.dart';
+
+/// Positive result if the colors would be mapped to the same argb8888 color.
+class _ColorMatcher extends Matcher {
+  _ColorMatcher(this._target);
+
+  final ui.Color _target;
+
+  @override
+  Description describe(Description description) {
+    return description.add('matches "$_target"');
+  }
+
+  @override
+  bool matches(dynamic item, Map<dynamic, dynamic> matchState) {
+    if (item is ui.Color) {
+      return item.colorSpace == _target.colorSpace &&
+          (item.a - _target.a).abs() <= (1 / 255) &&
+          (item.r - _target.r).abs() <= (1 / 255) &&
+          (item.g - _target.g).abs() <= (1 / 255) &&
+          (item.b - _target.b).abs() <= (1 / 255);
+    } else {
+      return false;
+    }
+  }
+
+}
+
+Matcher _matchesColor(ui.Color color) {
+  return _ColorMatcher(color);
+}
 
 class TestCanvas implements Canvas {
   final List<Invocation> invocations = <Invocation>[];
@@ -326,7 +356,7 @@ void main() {
     expect(call.positionalArguments[3], isA<Paint>());
     final Paint paint = call.positionalArguments[3] as Paint;
     expect(paint.colorFilter, colorFilter);
-    expect(paint.color, const Color(0x7F000000)); // 0.5 opacity
+    expect(paint.color, _matchesColor(const Color(0x7F000000))); // 0.5 opacity
     expect(paint.filterQuality, FilterQuality.high);
     expect(paint.isAntiAlias, true);
     expect(paint.invertColors, isTrue);
@@ -341,7 +371,7 @@ void main() {
         opacity: 0.99,
         scale: 2.01,
       ).toString(),
-      'DecorationImage(SynchronousTestImageProvider(), Alignment.center, scale 2.0, opacity 1.0, FilterQuality.low)',
+      'DecorationImage(SynchronousTestImageProvider(), Alignment.center, scale 2.0, opacity 1.0, FilterQuality.medium)',
     );
   });
 
@@ -389,7 +419,7 @@ void main() {
       '     BoxFit.contain, Alignment.center, centerSlice:\n'
       '     Rect.fromLTRB(10.0, 20.0, 40.0, 60.0), ImageRepeat.repeatY,\n'
       '     match text direction, scale 0.5, opacity 0.5,\n'
-      '     FilterQuality.low, invert colors, use anti-aliasing)\n'
+      '     FilterQuality.medium, invert colors, use anti-aliasing)\n'
       '   The ImageConfiguration was:\n'
       '     ImageConfiguration(size: Size(100.0, 100.0))\n',
     );
@@ -812,4 +842,17 @@ void main() {
 
     info.dispose();
   }, skip: kIsWeb); // https://github.com/flutter/flutter/issues/87442
+
+  test('BoxShadow.copyWith', () {
+    expect(const BoxShadow(), isNot(const BoxShadow(color: Color(0xFF112233))));
+    expect(const BoxShadow().copyWith(color: const Color(0xFF112233)), const BoxShadow(color: Color(0xFF112233)));
+    expect(const BoxShadow(), isNot(const BoxShadow(offset: Offset(1.0, 2.0))));
+    expect(const BoxShadow().copyWith(offset: const Offset(1.0, 2.0)), const BoxShadow(offset: Offset(1.0, 2.0)));
+    expect(const BoxShadow(), isNot(const BoxShadow(blurRadius: 123.0)));
+    expect(const BoxShadow().copyWith(blurRadius: 123.0), const BoxShadow(blurRadius: 123.0));
+    expect(const BoxShadow(), isNot(const BoxShadow(spreadRadius: 123.0)));
+    expect(const BoxShadow().copyWith(spreadRadius: 123.0), const BoxShadow(spreadRadius: 123.0));
+    expect(const BoxShadow(), isNot(const BoxShadow(blurStyle: BlurStyle.outer)));
+    expect(const BoxShadow().copyWith(blurStyle: BlurStyle.outer), const BoxShadow(blurStyle: BlurStyle.outer));
+  });
 }

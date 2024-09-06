@@ -14,7 +14,7 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:matcher/expect.dart' as matcher;
-import 'package:matcher/src/expect/async_matcher.dart';
+import 'package:matcher/src/expect/async_matcher.dart'; // ignore: implementation_imports
 
 import 'multi_view_testing.dart';
 
@@ -53,6 +53,9 @@ void main() {
     group('the group with retry flag', () {
       testWidgets('the test inside it', (WidgetTester tester) async {
         addTearDown(() => retried = true);
+        if (!retried) {
+          debugPrint('DISREGARD NEXT FAILURE, IT IS EXPECTED');
+        }
         expect(retried, isTrue);
       });
     }, retry: 1);
@@ -62,6 +65,9 @@ void main() {
     bool retried = false;
     testWidgets('the test with retry flag', (WidgetTester tester) async {
       addTearDown(() => retried = true);
+      if (!retried) {
+        debugPrint('DISREGARD NEXT FAILURE, IT IS EXPECTED');
+      }
       expect(retried, isTrue);
     }, retry: 1);
   });
@@ -557,6 +563,7 @@ void main() {
       };
 
       final TestWidgetsFlutterBinding binding = TestWidgetsFlutterBinding.ensureInitialized();
+      debugPrint('DISREGARD NEXT PENDING TIMER LIST, IT IS EXPECTED');
       await binding.runTest(() async {
         final Timer timer = Timer(const Duration(seconds: 1), () {});
         expect(timer.isActive, true);

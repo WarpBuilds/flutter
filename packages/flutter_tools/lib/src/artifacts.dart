@@ -22,9 +22,12 @@ enum Artifact {
   /// The flutter tester binary.
   flutterTester,
   flutterFramework,
+  flutterFrameworkDsym,
   flutterXcframework,
   /// The framework directory of the macOS desktop.
   flutterMacOSFramework,
+  flutterMacOSFrameworkDsym,
+  flutterMacOSXcframework,
   vmSnapshotData,
   isolateSnapshotData,
   icuData,
@@ -44,8 +47,6 @@ enum Artifact {
   dart2jsSnapshot,
   /// The dart snapshot of the dart2wasm compiler.
   dart2wasmSnapshot,
-  /// The wasm-opt binary that ships with the dart-sdk
-  wasmOptBinary,
 
   /// The root of the Linux desktop sources.
   linuxDesktopPath,
@@ -96,19 +97,34 @@ enum HostArtifact {
   /// The summary dill with null safety enabled for the dartdevc target.
   webPlatformDart2JSSoundKernelDill,
 
-  /// The precompiled SDKs and sourcemaps for web debug builds.
-  webPrecompiledSdk,
-  webPrecompiledSdkSourcemaps,
-  webPrecompiledCanvaskitSdk,
-  webPrecompiledCanvaskitSdkSourcemaps,
-  webPrecompiledCanvaskitAndHtmlSdk,
-  webPrecompiledCanvaskitAndHtmlSdkSourcemaps,
-  webPrecompiledSoundSdk,
-  webPrecompiledSoundSdkSourcemaps,
-  webPrecompiledCanvaskitSoundSdk,
-  webPrecompiledCanvaskitSoundSdkSourcemaps,
-  webPrecompiledCanvaskitAndHtmlSoundSdk,
-  webPrecompiledCanvaskitAndHtmlSoundSdkSourcemaps,
+  /// The precompiled SDKs and sourcemaps for web debug builds with the AMD module system.
+  // TODO(markzipan): delete these when DDC's AMD module system is deprecated, https://github.com/flutter/flutter/issues/142060.
+  webPrecompiledAmdSdk,
+  webPrecompiledAmdSdkSourcemaps,
+  webPrecompiledAmdCanvaskitSdk,
+  webPrecompiledAmdCanvaskitSdkSourcemaps,
+  webPrecompiledAmdCanvaskitAndHtmlSdk,
+  webPrecompiledAmdCanvaskitAndHtmlSdkSourcemaps,
+  webPrecompiledAmdSoundSdk,
+  webPrecompiledAmdSoundSdkSourcemaps,
+  webPrecompiledAmdCanvaskitSoundSdk,
+  webPrecompiledAmdCanvaskitSoundSdkSourcemaps,
+  webPrecompiledAmdCanvaskitAndHtmlSoundSdk,
+  webPrecompiledAmdCanvaskitAndHtmlSoundSdkSourcemaps,
+
+  /// The precompiled SDKs and sourcemaps for web debug builds with the DDC module system.
+  webPrecompiledDdcSdk,
+  webPrecompiledDdcSdkSourcemaps,
+  webPrecompiledDdcCanvaskitSdk,
+  webPrecompiledDdcCanvaskitSdkSourcemaps,
+  webPrecompiledDdcCanvaskitAndHtmlSdk,
+  webPrecompiledDdcCanvaskitAndHtmlSdkSourcemaps,
+  webPrecompiledDdcSoundSdk,
+  webPrecompiledDdcSoundSdkSourcemaps,
+  webPrecompiledDdcCanvaskitSoundSdk,
+  webPrecompiledDdcCanvaskitSoundSdkSourcemaps,
+  webPrecompiledDdcCanvaskitAndHtmlSoundSdk,
+  webPrecompiledDdcCanvaskitAndHtmlSoundSdkSourcemaps,
 
   iosDeploy,
   idevicesyslog,
@@ -167,10 +183,16 @@ String? _artifactToFileName(Artifact artifact, Platform hostPlatform, [ BuildMod
       return 'flutter_tester$exe';
     case Artifact.flutterFramework:
       return 'Flutter.framework';
+    case Artifact.flutterFrameworkDsym:
+      return 'Flutter.framework.dSYM';
     case Artifact.flutterXcframework:
       return 'Flutter.xcframework';
     case Artifact.flutterMacOSFramework:
       return 'FlutterMacOS.framework';
+    case Artifact.flutterMacOSFrameworkDsym:
+      return 'FlutterMacOS.framework.dSYM';
+    case Artifact.flutterMacOSXcframework:
+      return 'FlutterMacOS.xcframework';
     case Artifact.vmSnapshotData:
       return 'vm_isolate_snapshot.bin';
     case Artifact.isolateSnapshotData:
@@ -194,8 +216,6 @@ String? _artifactToFileName(Artifact artifact, Platform hostPlatform, [ BuildMod
       return 'dart2js.dart.snapshot';
     case Artifact.dart2wasmSnapshot:
       return 'dart2wasm_product.snapshot';
-    case Artifact.wasmOptBinary:
-      return 'wasm-opt$exe';
     case Artifact.frontendServerSnapshotForEngineDartSdk:
       return 'frontend_server_aot.dart.snapshot';
     case Artifact.linuxDesktopPath:
@@ -260,19 +280,31 @@ String _hostArtifactToFileName(HostArtifact artifact, Platform platform) {
       return 'dart2js_platform.dill';
     case HostArtifact.flutterWebLibrariesJson:
       return 'libraries.json';
-    case HostArtifact.webPrecompiledSdk:
-    case HostArtifact.webPrecompiledCanvaskitSdk:
-    case HostArtifact.webPrecompiledCanvaskitAndHtmlSdk:
-    case HostArtifact.webPrecompiledSoundSdk:
-    case HostArtifact.webPrecompiledCanvaskitSoundSdk:
-    case HostArtifact.webPrecompiledCanvaskitAndHtmlSoundSdk:
+    case HostArtifact.webPrecompiledAmdSdk:
+    case HostArtifact.webPrecompiledAmdCanvaskitSdk:
+    case HostArtifact.webPrecompiledAmdCanvaskitAndHtmlSdk:
+    case HostArtifact.webPrecompiledAmdSoundSdk:
+    case HostArtifact.webPrecompiledAmdCanvaskitSoundSdk:
+    case HostArtifact.webPrecompiledAmdCanvaskitAndHtmlSoundSdk:
+    case HostArtifact.webPrecompiledDdcSdk:
+    case HostArtifact.webPrecompiledDdcCanvaskitSdk:
+    case HostArtifact.webPrecompiledDdcCanvaskitAndHtmlSdk:
+    case HostArtifact.webPrecompiledDdcSoundSdk:
+    case HostArtifact.webPrecompiledDdcCanvaskitSoundSdk:
+    case HostArtifact.webPrecompiledDdcCanvaskitAndHtmlSoundSdk:
       return 'dart_sdk.js';
-    case HostArtifact.webPrecompiledSdkSourcemaps:
-    case HostArtifact.webPrecompiledCanvaskitSdkSourcemaps:
-    case HostArtifact.webPrecompiledCanvaskitAndHtmlSdkSourcemaps:
-    case HostArtifact.webPrecompiledSoundSdkSourcemaps:
-    case HostArtifact.webPrecompiledCanvaskitSoundSdkSourcemaps:
-    case HostArtifact.webPrecompiledCanvaskitAndHtmlSoundSdkSourcemaps:
+    case HostArtifact.webPrecompiledAmdSdkSourcemaps:
+    case HostArtifact.webPrecompiledAmdCanvaskitSdkSourcemaps:
+    case HostArtifact.webPrecompiledAmdCanvaskitAndHtmlSdkSourcemaps:
+    case HostArtifact.webPrecompiledAmdSoundSdkSourcemaps:
+    case HostArtifact.webPrecompiledAmdCanvaskitSoundSdkSourcemaps:
+    case HostArtifact.webPrecompiledAmdCanvaskitAndHtmlSoundSdkSourcemaps:
+    case HostArtifact.webPrecompiledDdcSdkSourcemaps:
+    case HostArtifact.webPrecompiledDdcCanvaskitSdkSourcemaps:
+    case HostArtifact.webPrecompiledDdcCanvaskitAndHtmlSdkSourcemaps:
+    case HostArtifact.webPrecompiledDdcSoundSdkSourcemaps:
+    case HostArtifact.webPrecompiledDdcCanvaskitSoundSdkSourcemaps:
+    case HostArtifact.webPrecompiledDdcCanvaskitAndHtmlSoundSdkSourcemaps:
       return 'dart_sdk.js.map';
     case HostArtifact.impellerc:
       return 'impellerc$exe';
@@ -297,7 +329,7 @@ class EngineBuildPaths {
 
 /// Information about a local engine build (i.e. `--local-engine[-host]=...`).
 ///
-/// See https://github.com/flutter/flutter/wiki/The-flutter-tool#using-a-locally-built-engine-with-the-flutter-tool
+/// See https://github.com/flutter/flutter/blob/main/docs/tool/README.md#using-a-locally-built-engine-with-the-flutter-tool
 /// for more information about local engine builds.
 class LocalEngineInfo {
   /// Creates a reference to a local engine build.
@@ -458,29 +490,53 @@ class CachedArtifacts implements Artifacts {
       case HostArtifact.webPlatformDart2JSSoundKernelDill:
         final String path = _fileSystem.path.join(_getFlutterWebSdkPath(), 'kernel', _hostArtifactToFileName(artifact, _platform));
         return _fileSystem.file(path);
-      case HostArtifact.webPrecompiledSdk:
-      case HostArtifact.webPrecompiledSdkSourcemaps:
+      case HostArtifact.webPrecompiledAmdSdk:
+      case HostArtifact.webPrecompiledAmdSdkSourcemaps:
         final String path = _fileSystem.path.join(_getFlutterWebSdkPath(), 'kernel', 'amd', _hostArtifactToFileName(artifact, _platform));
         return _fileSystem.file(path);
-      case HostArtifact.webPrecompiledCanvaskitSdk:
-      case HostArtifact.webPrecompiledCanvaskitSdkSourcemaps:
+      case HostArtifact.webPrecompiledAmdCanvaskitSdk:
+      case HostArtifact.webPrecompiledAmdCanvaskitSdkSourcemaps:
         final String path = _fileSystem.path.join(_getFlutterWebSdkPath(), 'kernel', 'amd-canvaskit', _hostArtifactToFileName(artifact, _platform));
         return _fileSystem.file(path);
-      case HostArtifact.webPrecompiledCanvaskitAndHtmlSdk:
-      case HostArtifact.webPrecompiledCanvaskitAndHtmlSdkSourcemaps:
+      case HostArtifact.webPrecompiledAmdCanvaskitAndHtmlSdk:
+      case HostArtifact.webPrecompiledAmdCanvaskitAndHtmlSdkSourcemaps:
         final String path = _fileSystem.path.join(_getFlutterWebSdkPath(), 'kernel', 'amd-canvaskit-html', _hostArtifactToFileName(artifact, _platform));
         return _fileSystem.file(path);
-      case HostArtifact.webPrecompiledSoundSdk:
-      case HostArtifact.webPrecompiledSoundSdkSourcemaps:
+      case HostArtifact.webPrecompiledAmdSoundSdk:
+      case HostArtifact.webPrecompiledAmdSoundSdkSourcemaps:
         final String path = _fileSystem.path.join(_getFlutterWebSdkPath(), 'kernel', 'amd-sound', _hostArtifactToFileName(artifact, _platform));
         return _fileSystem.file(path);
-      case HostArtifact.webPrecompiledCanvaskitSoundSdk:
-      case HostArtifact.webPrecompiledCanvaskitSoundSdkSourcemaps:
+      case HostArtifact.webPrecompiledAmdCanvaskitSoundSdk:
+      case HostArtifact.webPrecompiledAmdCanvaskitSoundSdkSourcemaps:
         final String path = _fileSystem.path.join(_getFlutterWebSdkPath(), 'kernel', 'amd-canvaskit-sound', _hostArtifactToFileName(artifact, _platform));
         return _fileSystem.file(path);
-      case HostArtifact.webPrecompiledCanvaskitAndHtmlSoundSdk:
-      case HostArtifact.webPrecompiledCanvaskitAndHtmlSoundSdkSourcemaps:
+      case HostArtifact.webPrecompiledAmdCanvaskitAndHtmlSoundSdk:
+      case HostArtifact.webPrecompiledAmdCanvaskitAndHtmlSoundSdkSourcemaps:
         final String path = _fileSystem.path.join(_getFlutterWebSdkPath(), 'kernel', 'amd-canvaskit-html-sound', _hostArtifactToFileName(artifact, _platform));
+        return _fileSystem.file(path);
+      case HostArtifact.webPrecompiledDdcSdk:
+      case HostArtifact.webPrecompiledDdcSdkSourcemaps:
+        final String path = _fileSystem.path.join(_getFlutterWebSdkPath(), 'kernel', 'ddc', _hostArtifactToFileName(artifact, _platform));
+        return _fileSystem.file(path);
+      case HostArtifact.webPrecompiledDdcCanvaskitSdk:
+      case HostArtifact.webPrecompiledDdcCanvaskitSdkSourcemaps:
+        final String path = _fileSystem.path.join(_getFlutterWebSdkPath(), 'kernel', 'ddc-canvaskit', _hostArtifactToFileName(artifact, _platform));
+        return _fileSystem.file(path);
+      case HostArtifact.webPrecompiledDdcCanvaskitAndHtmlSdk:
+      case HostArtifact.webPrecompiledDdcCanvaskitAndHtmlSdkSourcemaps:
+        final String path = _fileSystem.path.join(_getFlutterWebSdkPath(), 'kernel', 'ddc-canvaskit-html', _hostArtifactToFileName(artifact, _platform));
+        return _fileSystem.file(path);
+      case HostArtifact.webPrecompiledDdcSoundSdk:
+      case HostArtifact.webPrecompiledDdcSoundSdkSourcemaps:
+        final String path = _fileSystem.path.join(_getFlutterWebSdkPath(), 'kernel', 'ddc-sound', _hostArtifactToFileName(artifact, _platform));
+        return _fileSystem.file(path);
+      case HostArtifact.webPrecompiledDdcCanvaskitSoundSdk:
+      case HostArtifact.webPrecompiledDdcCanvaskitSoundSdkSourcemaps:
+        final String path = _fileSystem.path.join(_getFlutterWebSdkPath(), 'kernel', 'ddc-canvaskit-sound', _hostArtifactToFileName(artifact, _platform));
+        return _fileSystem.file(path);
+      case HostArtifact.webPrecompiledDdcCanvaskitAndHtmlSoundSdk:
+      case HostArtifact.webPrecompiledDdcCanvaskitAndHtmlSoundSdkSourcemaps:
+        final String path = _fileSystem.path.join(_getFlutterWebSdkPath(), 'kernel', 'ddc-canvaskit-html-sound', _hostArtifactToFileName(artifact, _platform));
         return _fileSystem.file(path);
       case HostArtifact.idevicesyslog:
       case HostArtifact.idevicescreenshot:
@@ -528,7 +584,7 @@ class CachedArtifacts implements Artifacts {
       case TargetPlatform.linux_arm64:
       case TargetPlatform.windows_x64:
       case TargetPlatform.windows_arm64:
-        return _getDesktopArtifactPath(artifact, platform, mode);
+        return _getDesktopArtifactPath(artifact, platform!, mode);
       case TargetPlatform.fuchsia_arm64:
       case TargetPlatform.fuchsia_x64:
         return _getFuchsiaArtifactPath(artifact, platform!, mode!);
@@ -544,14 +600,47 @@ class CachedArtifacts implements Artifacts {
     return _fileSystem.path.basename(_getEngineArtifactsPath(platform, mode)!);
   }
 
-  String _getDesktopArtifactPath(Artifact artifact, TargetPlatform? platform, BuildMode? mode) {
+  String _getDesktopArtifactPath(Artifact artifact, TargetPlatform platform, BuildMode? mode) {
     // When platform is null, a generic host platform artifact is being requested
     // and not the gen_snapshot for darwin as a target platform.
-    if (platform != null && artifact == Artifact.genSnapshot) {
-      final String engineDir = _getEngineArtifactsPath(platform, mode)!;
-      return _fileSystem.path.join(engineDir, _artifactToFileName(artifact, _platform));
+    final String engineDir = _getEngineArtifactsPath(platform, mode)!;
+    switch (artifact) {
+      case Artifact.genSnapshot:
+        return _fileSystem.path.join(engineDir, _artifactToFileName(artifact, _platform));
+      case Artifact.engineDartSdkPath:
+      case Artifact.engineDartBinary:
+      case Artifact.engineDartAotRuntime:
+      case Artifact.dart2jsSnapshot:
+      case Artifact.dart2wasmSnapshot:
+      case Artifact.frontendServerSnapshotForEngineDartSdk:
+      case Artifact.constFinder:
+      case Artifact.flutterFramework:
+      case Artifact.flutterFrameworkDsym:
+      case Artifact.flutterMacOSFramework:
+        return _getMacOSFrameworkPath(engineDir, _fileSystem, _platform);
+      case Artifact.flutterMacOSFrameworkDsym:
+        return _getMacOSFrameworkDsymPath(engineDir, _fileSystem, _platform);
+      case Artifact.flutterMacOSXcframework:
+      case Artifact.flutterPatchedSdkPath:
+      case Artifact.flutterTester:
+      case Artifact.flutterXcframework:
+      case Artifact.fontSubset:
+      case Artifact.fuchsiaFlutterRunner:
+      case Artifact.fuchsiaKernelCompiler:
+      case Artifact.icuData:
+      case Artifact.isolateSnapshotData:
+      case Artifact.linuxDesktopPath:
+      case Artifact.linuxHeaders:
+      case Artifact.platformKernelDill:
+      case Artifact.platformLibrariesJson:
+      case Artifact.skyEnginePath:
+      case Artifact.vmSnapshotData:
+      case Artifact.windowsCppClientWrapper:
+      case Artifact.windowsDesktopPath:
+      case Artifact.flutterToolsFileGenerators:
+      case Artifact.flutterPreviewDevice:
+        return _getHostArtifactPath(artifact, platform, mode);
     }
-    return _getHostArtifactPath(artifact, platform ?? _currentHostPlatform(_platform, _operatingSystemUtils), mode);
   }
 
   String _getAndroidArtifactPath(Artifact artifact, TargetPlatform platform, BuildMode mode) {
@@ -566,11 +655,13 @@ class CachedArtifacts implements Artifacts {
       case Artifact.engineDartAotRuntime:
       case Artifact.dart2jsSnapshot:
       case Artifact.dart2wasmSnapshot:
-      case Artifact.wasmOptBinary:
       case Artifact.frontendServerSnapshotForEngineDartSdk:
       case Artifact.constFinder:
       case Artifact.flutterFramework:
+      case Artifact.flutterFrameworkDsym:
       case Artifact.flutterMacOSFramework:
+      case Artifact.flutterMacOSFrameworkDsym:
+      case Artifact.flutterMacOSXcframework:
       case Artifact.flutterPatchedSdkPath:
       case Artifact.flutterTester:
       case Artifact.flutterXcframework:
@@ -602,16 +693,20 @@ class CachedArtifacts implements Artifacts {
         return _fileSystem.path.join(engineDir, artifactFileName);
       case Artifact.flutterFramework:
         final String engineDir = _getEngineArtifactsPath(platform, mode)!;
-        return _getIosEngineArtifactPath(engineDir, environmentType, _fileSystem, _platform);
+        return _getIosFrameworkPath(engineDir, environmentType, _fileSystem, _platform);
+      case Artifact.flutterFrameworkDsym:
+        final String engineDir = _getEngineArtifactsPath(platform, mode)!;
+        return _getIosFrameworkDsymPath(engineDir, environmentType, _fileSystem, _platform);
       case Artifact.engineDartSdkPath:
       case Artifact.engineDartBinary:
       case Artifact.engineDartAotRuntime:
       case Artifact.dart2jsSnapshot:
       case Artifact.dart2wasmSnapshot:
-      case Artifact.wasmOptBinary:
       case Artifact.frontendServerSnapshotForEngineDartSdk:
       case Artifact.constFinder:
       case Artifact.flutterMacOSFramework:
+      case Artifact.flutterMacOSFrameworkDsym:
+      case Artifact.flutterMacOSXcframework:
       case Artifact.flutterPatchedSdkPath:
       case Artifact.flutterTester:
       case Artifact.fontSubset:
@@ -659,7 +754,10 @@ class CachedArtifacts implements Artifacts {
         return _fileSystem.path.join(root, runtime, artifactFileName);
       case Artifact.constFinder:
       case Artifact.flutterFramework:
+      case Artifact.flutterFrameworkDsym:
       case Artifact.flutterMacOSFramework:
+      case Artifact.flutterMacOSFrameworkDsym:
+      case Artifact.flutterMacOSXcframework:
       case Artifact.flutterTester:
       case Artifact.flutterXcframework:
       case Artifact.fontSubset:
@@ -668,7 +766,6 @@ class CachedArtifacts implements Artifacts {
       case Artifact.engineDartAotRuntime:
       case Artifact.dart2jsSnapshot:
       case Artifact.dart2wasmSnapshot:
-      case Artifact.wasmOptBinary:
       case Artifact.frontendServerSnapshotForEngineDartSdk:
       case Artifact.icuData:
       case Artifact.isolateSnapshotData:
@@ -708,11 +805,6 @@ class CachedArtifacts implements Artifacts {
           _dartSdkPath(_cache), 'bin', 'snapshots',
           _artifactToFileName(artifact, _platform),
         );
-      case Artifact.wasmOptBinary:
-        return _fileSystem.path.join(
-          _dartSdkPath(_cache), 'bin', 'utils',
-          _artifactToFileName(artifact, _platform),
-        );
       case Artifact.flutterTester:
       case Artifact.vmSnapshotData:
       case Artifact.isolateSnapshotData:
@@ -732,6 +824,20 @@ class CachedArtifacts implements Artifacts {
       case Artifact.engineDartAotRuntime:
         return _fileSystem.path.join(_dartSdkPath(_cache), 'bin', _artifactToFileName(artifact, _platform));
       case Artifact.flutterMacOSFramework:
+        String platformDirName = _enginePlatformDirectoryName(platform);
+        if (mode == BuildMode.profile || mode == BuildMode.release) {
+          platformDirName = '$platformDirName-${mode!.cliName}';
+        }
+        final String engineArtifactsPath = _cache.getArtifactDirectory('engine').path;
+        return _getMacOSFrameworkPath(_fileSystem.path.join(engineArtifactsPath, platformDirName), _fileSystem, _platform);
+      case Artifact.flutterMacOSFrameworkDsym:
+        String platformDirName = _enginePlatformDirectoryName(platform);
+        if (mode == BuildMode.profile || mode == BuildMode.release) {
+          platformDirName = '$platformDirName-${mode!.cliName}';
+        }
+        final String engineArtifactsPath = _cache.getArtifactDirectory('engine').path;
+        return _getMacOSFrameworkDsymPath(_fileSystem.path.join(engineArtifactsPath, platformDirName), _fileSystem, _platform);
+      case Artifact.flutterMacOSXcframework:
       case Artifact.linuxDesktopPath:
       case Artifact.windowsDesktopPath:
       case Artifact.linuxHeaders:
@@ -758,6 +864,7 @@ class CachedArtifacts implements Artifacts {
                      .childFile(_artifactToFileName(artifact, _platform, mode)!)
                      .path;
       case Artifact.flutterFramework:
+      case Artifact.flutterFrameworkDsym:
       case Artifact.flutterXcframework:
       case Artifact.fuchsiaFlutterRunner:
       case Artifact.fuchsiaKernelCompiler:
@@ -785,7 +892,7 @@ class CachedArtifacts implements Artifacts {
         if (mode == BuildMode.debug || mode == null) {
           return _fileSystem.path.join(engineDir, platformName);
         }
-        final String suffix = mode != BuildMode.debug ? '-${snakeCase(mode.cliName, '-')}' : '';
+        final String suffix = mode != BuildMode.debug ? '-${kebabCase(mode.cliName)}' : '';
         return _fileSystem.path.join(engineDir, platformName + suffix);
       case TargetPlatform.fuchsia_arm64:
       case TargetPlatform.fuchsia_x64:
@@ -799,7 +906,7 @@ class CachedArtifacts implements Artifacts {
       case TargetPlatform.android_x64:
       case TargetPlatform.android_x86:
         assert(mode != null, 'Need to specify a build mode for platform $platform.');
-        final String suffix = mode != BuildMode.debug ? '-${snakeCase(mode!.cliName, '-')}' : '';
+        final String suffix = mode != BuildMode.debug ? '-${kebabCase(mode!.cliName)}' : '';
         return _fileSystem.path.join(engineDir, platformName + suffix);
       case TargetPlatform.android:
         assert(false, 'cannot use TargetPlatform.android to look up artifacts');
@@ -826,8 +933,16 @@ TargetPlatform _currentHostPlatform(Platform platform, OperatingSystemUtils oper
   throw UnimplementedError('Host OS not supported.');
 }
 
-String _getIosEngineArtifactPath(String engineDirectory,
-    EnvironmentType? environmentType, FileSystem fileSystem, Platform hostPlatform) {
+/// Returns the Flutter.xcframework platform directory for the specified environment type.
+///
+/// `Flutter.xcframework` contains target environment/architecture-specific
+/// subdirectories containing the appropriate `Flutter.framework` and
+/// `dSYMs/Flutter.framework.dSYMs` bundles for that target architecture.
+Directory _getIosFlutterFrameworkPlatformDirectory(
+    String engineDirectory,
+    EnvironmentType? environmentType,
+    FileSystem fileSystem,
+    Platform hostPlatform) {
   final Directory xcframeworkDirectory = fileSystem
       .directory(engineDirectory)
       .childDirectory(_artifactToFileName(Artifact.flutterXcframework, hostPlatform)!);
@@ -835,9 +950,7 @@ String _getIosEngineArtifactPath(String engineDirectory,
   if (!xcframeworkDirectory.existsSync()) {
     throwToolExit('No xcframework found at ${xcframeworkDirectory.path}. Try running "flutter precache --ios".');
   }
-  Directory? flutterFrameworkSource;
-  for (final Directory platformDirectory
-      in xcframeworkDirectory.listSync().whereType<Directory>()) {
+  for (final Directory platformDirectory in xcframeworkDirectory.listSync().whereType<Directory>()) {
     if (!platformDirectory.basename.startsWith('ios-')) {
       continue;
     }
@@ -845,15 +958,99 @@ String _getIosEngineArtifactPath(String engineDirectory,
     final bool simulatorDirectory = platformDirectory.basename.endsWith('-simulator');
     if ((environmentType == EnvironmentType.simulator && simulatorDirectory) ||
         (environmentType == EnvironmentType.physical && !simulatorDirectory)) {
-      flutterFrameworkSource = platformDirectory;
+      return platformDirectory;
     }
   }
-  if (flutterFrameworkSource == null) {
-    throwToolExit('No iOS frameworks found in ${xcframeworkDirectory.path}');
-  }
+  throwToolExit('No iOS frameworks found in ${xcframeworkDirectory.path}');
+}
 
-  return flutterFrameworkSource
+/// Returns the path to Flutter.framework.
+String _getIosFrameworkPath(
+    String engineDirectory,
+    EnvironmentType? environmentType,
+    FileSystem fileSystem,
+    Platform hostPlatform) {
+  final Directory platformDir = _getIosFlutterFrameworkPlatformDirectory(
+    engineDirectory,
+    environmentType,
+    fileSystem,
+    hostPlatform,
+  );
+  return platformDir
       .childDirectory(_artifactToFileName(Artifact.flutterFramework, hostPlatform)!)
+      .path;
+}
+
+/// Returns the path to Flutter.framework.dSYM.
+String _getIosFrameworkDsymPath(
+    String engineDirectory,
+    EnvironmentType? environmentType,
+    FileSystem fileSystem,
+    Platform hostPlatform) {
+  final Directory platformDir = _getIosFlutterFrameworkPlatformDirectory(
+    engineDirectory,
+    environmentType,
+    fileSystem,
+    hostPlatform,
+  );
+  return platformDir
+      .childDirectory('dSYMs')
+      .childDirectory(_artifactToFileName(Artifact.flutterFrameworkDsym, hostPlatform)!)
+      .path;
+}
+
+/// Returns the Flutter.xcframework platform directory for the specified environment type.
+///
+/// `FlutterMacOS.xcframework` contains target environment/architecture-specific
+/// subdirectories containing the appropriate `FlutterMacOS.framework` and
+/// `FlutterMacOS.framework.dSYM` bundles for that target architecture. At present,
+/// there is only one such directory: `macos-arm64_x86_64`.
+Directory _getMacOSFrameworkPlatformDirectory(
+  String engineDirectory,
+  FileSystem fileSystem,
+  Platform hostPlatform,
+) {
+  final Directory xcframeworkDirectory = fileSystem
+      .directory(engineDirectory)
+      .childDirectory(_artifactToFileName(Artifact.flutterMacOSXcframework, hostPlatform)!);
+
+  if (!xcframeworkDirectory.existsSync()) {
+    throwToolExit('No xcframework found at ${xcframeworkDirectory.path}. Try running "flutter precache --macos".');
+  }
+  final Directory? platformDirectory = xcframeworkDirectory
+      .listSync()
+      .whereType<Directory>()
+      .where((Directory platformDirectory) =>
+          platformDirectory.basename.startsWith('macos-'))
+      .firstOrNull;
+  if (platformDirectory == null) {
+    throwToolExit('No macOS frameworks found in ${xcframeworkDirectory.path}');
+  }
+  return platformDirectory;
+}
+
+/// Returns the path to `FlutterMacOS.framework`.
+String _getMacOSFrameworkPath(
+  String engineDirectory,
+  FileSystem fileSystem,
+  Platform hostPlatform,
+) {
+  final Directory platformDirectory = _getMacOSFrameworkPlatformDirectory(engineDirectory, fileSystem, hostPlatform);
+  return platformDirectory
+      .childDirectory(_artifactToFileName(Artifact.flutterMacOSFramework, hostPlatform)!)
+      .path;
+}
+
+/// Returns the path to `FlutterMacOS.framework`.
+String _getMacOSFrameworkDsymPath(
+  String engineDirectory,
+  FileSystem fileSystem,
+  Platform hostPlatform,
+) {
+  final Directory platformDirectory = _getMacOSFrameworkPlatformDirectory(engineDirectory, fileSystem, hostPlatform);
+  return platformDirectory
+      .childDirectory('dSYMs')
+      .childDirectory(_artifactToFileName(Artifact.flutterMacOSFrameworkDsym, hostPlatform)!)
       .path;
 }
 
@@ -898,7 +1095,9 @@ class CachedLocalEngineArtifacts implements Artifacts {
   final Artifacts _backupCache;
 
   @override
-  FileSystemEntity getHostArtifact(HostArtifact artifact) {
+  FileSystemEntity getHostArtifact(
+    HostArtifact artifact,
+  ) {
     switch (artifact) {
       case HostArtifact.flutterWebSdk:
         final String path = _getFlutterWebSdkPath();
@@ -918,29 +1117,53 @@ class CachedLocalEngineArtifacts implements Artifacts {
       case HostArtifact.webPlatformDart2JSSoundKernelDill:
         final String path = _fileSystem.path.join(_getFlutterWebSdkPath(), 'kernel', _hostArtifactToFileName(artifact, _platform));
         return _fileSystem.file(path);
-      case HostArtifact.webPrecompiledSdk:
-      case HostArtifact.webPrecompiledSdkSourcemaps:
+      case HostArtifact.webPrecompiledAmdSdk:
+      case HostArtifact.webPrecompiledAmdSdkSourcemaps:
         final String path = _fileSystem.path.join(_getFlutterWebSdkPath(), 'kernel', 'amd', _hostArtifactToFileName(artifact, _platform));
         return _fileSystem.file(path);
-      case HostArtifact.webPrecompiledCanvaskitSdk:
-      case HostArtifact.webPrecompiledCanvaskitSdkSourcemaps:
+      case HostArtifact.webPrecompiledAmdCanvaskitSdk:
+      case HostArtifact.webPrecompiledAmdCanvaskitSdkSourcemaps:
         final String path = _fileSystem.path.join(_getFlutterWebSdkPath(), 'kernel', 'amd-canvaskit', _hostArtifactToFileName(artifact, _platform));
         return _fileSystem.file(path);
-      case HostArtifact.webPrecompiledCanvaskitAndHtmlSdk:
-      case HostArtifact.webPrecompiledCanvaskitAndHtmlSdkSourcemaps:
+      case HostArtifact.webPrecompiledAmdCanvaskitAndHtmlSdk:
+      case HostArtifact.webPrecompiledAmdCanvaskitAndHtmlSdkSourcemaps:
         final String path = _fileSystem.path.join(_getFlutterWebSdkPath(), 'kernel', 'amd-canvaskit-html', _hostArtifactToFileName(artifact, _platform));
         return _fileSystem.file(path);
-      case HostArtifact.webPrecompiledSoundSdk:
-      case HostArtifact.webPrecompiledSoundSdkSourcemaps:
+      case HostArtifact.webPrecompiledAmdSoundSdk:
+      case HostArtifact.webPrecompiledAmdSoundSdkSourcemaps:
         final String path = _fileSystem.path.join(_getFlutterWebSdkPath(), 'kernel', 'amd-sound', _hostArtifactToFileName(artifact, _platform));
         return _fileSystem.file(path);
-      case HostArtifact.webPrecompiledCanvaskitSoundSdk:
-      case HostArtifact.webPrecompiledCanvaskitSoundSdkSourcemaps:
+      case HostArtifact.webPrecompiledAmdCanvaskitSoundSdk:
+      case HostArtifact.webPrecompiledAmdCanvaskitSoundSdkSourcemaps:
         final String path = _fileSystem.path.join(_getFlutterWebSdkPath(), 'kernel', 'amd-canvaskit-sound', _hostArtifactToFileName(artifact, _platform));
         return _fileSystem.file(path);
-      case HostArtifact.webPrecompiledCanvaskitAndHtmlSoundSdk:
-      case HostArtifact.webPrecompiledCanvaskitAndHtmlSoundSdkSourcemaps:
+      case HostArtifact.webPrecompiledAmdCanvaskitAndHtmlSoundSdk:
+      case HostArtifact.webPrecompiledAmdCanvaskitAndHtmlSoundSdkSourcemaps:
         final String path = _fileSystem.path.join(_getFlutterWebSdkPath(), 'kernel', 'amd-canvaskit-html-sound', _hostArtifactToFileName(artifact, _platform));
+        return _fileSystem.file(path);
+      case HostArtifact.webPrecompiledDdcSdk:
+      case HostArtifact.webPrecompiledDdcSdkSourcemaps:
+        final String path = _fileSystem.path.join(_getFlutterWebSdkPath(), 'kernel', 'ddc', _hostArtifactToFileName(artifact, _platform));
+        return _fileSystem.file(path);
+      case HostArtifact.webPrecompiledDdcCanvaskitSdk:
+      case HostArtifact.webPrecompiledDdcCanvaskitSdkSourcemaps:
+        final String path = _fileSystem.path.join(_getFlutterWebSdkPath(), 'kernel', 'ddc-canvaskit', _hostArtifactToFileName(artifact, _platform));
+        return _fileSystem.file(path);
+      case HostArtifact.webPrecompiledDdcCanvaskitAndHtmlSdk:
+      case HostArtifact.webPrecompiledDdcCanvaskitAndHtmlSdkSourcemaps:
+        final String path = _fileSystem.path.join(_getFlutterWebSdkPath(), 'kernel', 'ddc-canvaskit-html', _hostArtifactToFileName(artifact, _platform));
+        return _fileSystem.file(path);
+      case HostArtifact.webPrecompiledDdcSoundSdk:
+      case HostArtifact.webPrecompiledDdcSoundSdkSourcemaps:
+        final String path = _fileSystem.path.join(_getFlutterWebSdkPath(), 'kernel', 'ddc-sound', _hostArtifactToFileName(artifact, _platform));
+        return _fileSystem.file(path);
+      case HostArtifact.webPrecompiledDdcCanvaskitSoundSdk:
+      case HostArtifact.webPrecompiledDdcCanvaskitSoundSdkSourcemaps:
+        final String path = _fileSystem.path.join(_getFlutterWebSdkPath(), 'kernel', 'ddc-canvaskit-sound', _hostArtifactToFileName(artifact, _platform));
+        return _fileSystem.file(path);
+      case HostArtifact.webPrecompiledDdcCanvaskitAndHtmlSoundSdk:
+      case HostArtifact.webPrecompiledDdcCanvaskitAndHtmlSoundSdkSourcemaps:
+        final String path = _fileSystem.path.join(_getFlutterWebSdkPath(), 'kernel', 'ddc-canvaskit-html-sound', _hostArtifactToFileName(artifact, _platform));
         return _fileSystem.file(path);
       case HostArtifact.idevicesyslog:
       case HostArtifact.idevicescreenshot:
@@ -989,7 +1212,7 @@ class CachedLocalEngineArtifacts implements Artifacts {
         return _fileSystem.path.join(localEngineInfo.targetOutPath, 'gen', 'flutter', 'lib', 'snapshot', artifactFileName);
       case Artifact.icuData:
       case Artifact.flutterXcframework:
-      case Artifact.flutterMacOSFramework:
+      case Artifact.flutterMacOSXcframework:
         return _fileSystem.path.join(localEngineInfo.targetOutPath, artifactFileName);
       case Artifact.platformKernelDill:
         if (platform == TargetPlatform.fuchsia_x64 || platform == TargetPlatform.fuchsia_arm64) {
@@ -999,8 +1222,17 @@ class CachedLocalEngineArtifacts implements Artifacts {
       case Artifact.platformLibrariesJson:
         return _fileSystem.path.join(_getFlutterPatchedSdkPath(mode), 'lib', artifactFileName);
       case Artifact.flutterFramework:
-        return _getIosEngineArtifactPath(
+        return _getIosFrameworkPath(
             localEngineInfo.targetOutPath, environmentType, _fileSystem, _platform);
+      case Artifact.flutterFrameworkDsym:
+        return _getIosFrameworkDsymPath(
+            localEngineInfo.targetOutPath, environmentType, _fileSystem, _platform);
+      case Artifact.flutterMacOSFramework:
+        return _getMacOSFrameworkPath(
+            localEngineInfo.targetOutPath, _fileSystem, _platform);
+      case Artifact.flutterMacOSFrameworkDsym:
+        return _getMacOSFrameworkDsymPath(
+            localEngineInfo.targetOutPath, _fileSystem, _platform);
       case Artifact.flutterPatchedSdkPath:
         // When using local engine always use [BuildMode.debug] regardless of
         // what was specified in [mode] argument because local engine will
@@ -1039,8 +1271,6 @@ class CachedLocalEngineArtifacts implements Artifacts {
       case Artifact.dart2wasmSnapshot:
       case Artifact.frontendServerSnapshotForEngineDartSdk:
         return _fileSystem.path.join(_getDartSdkPath(), 'bin', 'snapshots', artifactFileName);
-      case Artifact.wasmOptBinary:
-        return _fileSystem.path.join(_getDartSdkPath(), 'bin', 'utils', artifactFileName);
       case Artifact.flutterToolsFileGenerators:
         return _getFileGeneratorsPath();
       case Artifact.flutterPreviewDevice:
@@ -1178,16 +1408,14 @@ class CachedLocalWebSdkArtifacts implements Artifacts {
             _getDartSdkPath(), 'bin', 'snapshots',
             _artifactToFileName(artifact, _platform, mode),
           );
-        case Artifact.wasmOptBinary:
-          return _fileSystem.path.join(
-            _getDartSdkPath(), 'bin', 'utils',
-            _artifactToFileName(artifact, _platform, mode),
-          );
         case Artifact.genSnapshot:
         case Artifact.flutterTester:
         case Artifact.flutterFramework:
+        case Artifact.flutterFrameworkDsym:
         case Artifact.flutterXcframework:
         case Artifact.flutterMacOSFramework:
+        case Artifact.flutterMacOSFrameworkDsym:
+        case Artifact.flutterMacOSXcframework:
         case Artifact.vmSnapshotData:
         case Artifact.isolateSnapshotData:
         case Artifact.icuData:
@@ -1215,7 +1443,9 @@ class CachedLocalWebSdkArtifacts implements Artifacts {
   String getEngineType(TargetPlatform platform, [BuildMode? mode]) => _parent.getEngineType(platform, mode);
 
   @override
-  FileSystemEntity getHostArtifact(HostArtifact artifact) {
+  FileSystemEntity getHostArtifact(
+    HostArtifact artifact,
+  ) {
     switch (artifact) {
       case HostArtifact.flutterWebSdk:
         final String path = _getFlutterWebSdkPath();
@@ -1235,29 +1465,53 @@ class CachedLocalWebSdkArtifacts implements Artifacts {
       case HostArtifact.webPlatformDart2JSSoundKernelDill:
         final String path = _fileSystem.path.join(_getFlutterWebSdkPath(), 'kernel', _hostArtifactToFileName(artifact, _platform));
         return _fileSystem.file(path);
-      case HostArtifact.webPrecompiledSdk:
-      case HostArtifact.webPrecompiledSdkSourcemaps:
+      case HostArtifact.webPrecompiledAmdSdk:
+      case HostArtifact.webPrecompiledAmdSdkSourcemaps:
         final String path = _fileSystem.path.join(_getFlutterWebSdkPath(), 'kernel', 'amd', _hostArtifactToFileName(artifact, _platform));
         return _fileSystem.file(path);
-      case HostArtifact.webPrecompiledCanvaskitSdk:
-      case HostArtifact.webPrecompiledCanvaskitSdkSourcemaps:
+      case HostArtifact.webPrecompiledAmdCanvaskitSdk:
+      case HostArtifact.webPrecompiledAmdCanvaskitSdkSourcemaps:
         final String path = _fileSystem.path.join(_getFlutterWebSdkPath(), 'kernel', 'amd-canvaskit', _hostArtifactToFileName(artifact, _platform));
         return _fileSystem.file(path);
-      case HostArtifact.webPrecompiledCanvaskitAndHtmlSdk:
-      case HostArtifact.webPrecompiledCanvaskitAndHtmlSdkSourcemaps:
+      case HostArtifact.webPrecompiledAmdCanvaskitAndHtmlSdk:
+      case HostArtifact.webPrecompiledAmdCanvaskitAndHtmlSdkSourcemaps:
         final String path = _fileSystem.path.join(_getFlutterWebSdkPath(), 'kernel', 'amd-canvaskit-html', _hostArtifactToFileName(artifact, _platform));
         return _fileSystem.file(path);
-      case HostArtifact.webPrecompiledSoundSdk:
-      case HostArtifact.webPrecompiledSoundSdkSourcemaps:
+      case HostArtifact.webPrecompiledAmdSoundSdk:
+      case HostArtifact.webPrecompiledAmdSoundSdkSourcemaps:
         final String path = _fileSystem.path.join(_getFlutterWebSdkPath(), 'kernel', 'amd-sound', _hostArtifactToFileName(artifact, _platform));
         return _fileSystem.file(path);
-      case HostArtifact.webPrecompiledCanvaskitSoundSdk:
-      case HostArtifact.webPrecompiledCanvaskitSoundSdkSourcemaps:
+      case HostArtifact.webPrecompiledAmdCanvaskitSoundSdk:
+      case HostArtifact.webPrecompiledAmdCanvaskitSoundSdkSourcemaps:
         final String path = _fileSystem.path.join(_getFlutterWebSdkPath(), 'kernel', 'amd-canvaskit-sound', _hostArtifactToFileName(artifact, _platform));
         return _fileSystem.file(path);
-      case HostArtifact.webPrecompiledCanvaskitAndHtmlSoundSdk:
-      case HostArtifact.webPrecompiledCanvaskitAndHtmlSoundSdkSourcemaps:
+      case HostArtifact.webPrecompiledAmdCanvaskitAndHtmlSoundSdk:
+      case HostArtifact.webPrecompiledAmdCanvaskitAndHtmlSoundSdkSourcemaps:
         final String path = _fileSystem.path.join(_getFlutterWebSdkPath(), 'kernel', 'amd-canvaskit-html-sound', _hostArtifactToFileName(artifact, _platform));
+        return _fileSystem.file(path);
+      case HostArtifact.webPrecompiledDdcSdk:
+      case HostArtifact.webPrecompiledDdcSdkSourcemaps:
+        final String path = _fileSystem.path.join(_getFlutterWebSdkPath(), 'kernel', 'ddc', _hostArtifactToFileName(artifact, _platform));
+        return _fileSystem.file(path);
+      case HostArtifact.webPrecompiledDdcCanvaskitSdk:
+      case HostArtifact.webPrecompiledDdcCanvaskitSdkSourcemaps:
+        final String path = _fileSystem.path.join(_getFlutterWebSdkPath(), 'kernel', 'ddc-canvaskit', _hostArtifactToFileName(artifact, _platform));
+        return _fileSystem.file(path);
+      case HostArtifact.webPrecompiledDdcCanvaskitAndHtmlSdk:
+      case HostArtifact.webPrecompiledDdcCanvaskitAndHtmlSdkSourcemaps:
+        final String path = _fileSystem.path.join(_getFlutterWebSdkPath(), 'kernel', 'ddc-canvaskit-html', _hostArtifactToFileName(artifact, _platform));
+        return _fileSystem.file(path);
+      case HostArtifact.webPrecompiledDdcSoundSdk:
+      case HostArtifact.webPrecompiledDdcSoundSdkSourcemaps:
+        final String path = _fileSystem.path.join(_getFlutterWebSdkPath(), 'kernel', 'ddc-sound', _hostArtifactToFileName(artifact, _platform));
+        return _fileSystem.file(path);
+      case HostArtifact.webPrecompiledDdcCanvaskitSoundSdk:
+      case HostArtifact.webPrecompiledDdcCanvaskitSoundSdkSourcemaps:
+        final String path = _fileSystem.path.join(_getFlutterWebSdkPath(), 'kernel', 'ddc-canvaskit-sound', _hostArtifactToFileName(artifact, _platform));
+        return _fileSystem.file(path);
+      case HostArtifact.webPrecompiledDdcCanvaskitAndHtmlSoundSdk:
+      case HostArtifact.webPrecompiledDdcCanvaskitAndHtmlSoundSdkSourcemaps:
+        final String path = _fileSystem.path.join(_getFlutterWebSdkPath(), 'kernel', 'ddc-canvaskit-html-sound', _hostArtifactToFileName(artifact, _platform));
         return _fileSystem.file(path);
       case HostArtifact.iosDeploy:
       case HostArtifact.idevicesyslog:

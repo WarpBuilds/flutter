@@ -699,8 +699,10 @@ void main() {
       '   scrollExtentMin: null\n'
       '   scrollPosition: null\n'
       '   scrollExtentMax: null\n'
+      '   indexInParent: null\n'
       '   elevation: 0.0\n'
-      '   thickness: 0.0\n',
+      '   thickness: 0.0\n'
+      '   headingLevel: 0\n',
     );
 
     final SemanticsConfiguration config = SemanticsConfiguration()
@@ -823,8 +825,10 @@ void main() {
       '   scrollExtentMin: null\n'
       '   scrollPosition: null\n'
       '   scrollExtentMax: null\n'
+      '   indexInParent: null\n'
       '   elevation: 0.0\n'
-      '   thickness: 0.0\n',
+      '   thickness: 0.0\n'
+      '   headingLevel: 0\n',
     );
   });
 
@@ -978,6 +982,10 @@ void main() {
     );
   });
 
+  test('SemanticsNode.indexInParent appears in string output', () async {
+    final SemanticsNode node = SemanticsNode()..indexInParent = 10;
+    expect(node.toString(), contains('indexInParent: 10'));
+  });
 }
 
 class TestRender extends RenderProxyBox {

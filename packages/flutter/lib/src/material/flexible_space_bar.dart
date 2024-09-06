@@ -2,6 +2,10 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+/// @docImport 'app_bar.dart';
+/// @docImport 'scaffold.dart';
+library;
+
 import 'dart:math' as math;
 import 'dart:ui' as ui;
 
@@ -30,7 +34,7 @@ enum StretchMode {
   /// The background widget will expand to fill the extra space.
   zoomBackground,
 
-  /// The background will blur using a [ImageFilter.blur] effect.
+  /// The background will blur using a [ui.ImageFilter.blur] effect.
   blurBackground,
 
   /// The title will fade away as the user over-scrolls.
@@ -185,32 +189,20 @@ class FlexibleSpaceBar extends StatefulWidget {
 
 class _FlexibleSpaceBarState extends State<FlexibleSpaceBar> {
   bool _getEffectiveCenterTitle(ThemeData theme) {
-    if (widget.centerTitle != null) {
-      return widget.centerTitle!;
-    }
-    switch (theme.platform) {
-      case TargetPlatform.android:
-      case TargetPlatform.fuchsia:
-      case TargetPlatform.linux:
-      case TargetPlatform.windows:
-        return false;
-      case TargetPlatform.iOS:
-      case TargetPlatform.macOS:
-        return true;
-    }
+    return widget.centerTitle ?? switch (theme.platform) {
+      TargetPlatform.android || TargetPlatform.fuchsia || TargetPlatform.linux || TargetPlatform.windows => false,
+      TargetPlatform.iOS || TargetPlatform.macOS => true,
+    };
   }
 
   Alignment _getTitleAlignment(bool effectiveCenterTitle) {
     if (effectiveCenterTitle) {
       return Alignment.bottomCenter;
     }
-    final TextDirection textDirection = Directionality.of(context);
-    switch (textDirection) {
-      case TextDirection.rtl:
-        return Alignment.bottomRight;
-      case TextDirection.ltr:
-        return Alignment.bottomLeft;
-    }
+    return switch (Directionality.of(context)) {
+      TextDirection.rtl => Alignment.bottomRight,
+      TextDirection.ltr => Alignment.bottomLeft,
+    };
   }
 
   double _getCollapsePadding(double t, FlexibleSpaceBarSettings settings) {
@@ -414,7 +406,7 @@ class FlexibleSpaceBarSettings extends InheritedWidget {
   /// True if the FlexibleSpaceBar overlaps the primary scrollable's contents.
   ///
   /// This value is used by the [AppBar] to resolve
-  /// [AppBar.backgroundColor] against [MaterialState.scrolledUnder],
+  /// [AppBar.backgroundColor] against [WidgetState.scrolledUnder],
   /// i.e. to enable apps to specify different colors when content
   /// has been scrolled up and behind the app bar.
   ///

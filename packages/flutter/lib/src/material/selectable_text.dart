@@ -2,6 +2,12 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+/// @docImport 'color_scheme.dart';
+/// @docImport 'scaffold.dart';
+/// @docImport 'selection_area.dart';
+/// @docImport 'text_field.dart';
+library;
+
 import 'dart:ui' as ui show BoxHeightStyle, BoxWidthStyle;
 
 import 'package:flutter/cupertino.dart';
@@ -11,7 +17,6 @@ import 'package:flutter/rendering.dart';
 
 import 'adaptive_text_selection_toolbar.dart';
 import 'desktop_text_selection.dart';
-import 'feedback.dart';
 import 'magnifier.dart';
 import 'text_selection.dart';
 import 'theme.dart';
@@ -117,12 +122,10 @@ class _SelectableTextSelectionGestureDetectorBuilder extends TextSelectionGestur
     final Offset editableOffset = renderEditable.maxLines == 1
         ? Offset(renderEditable.offset.pixels - _dragStartViewportOffset, 0.0)
         : Offset(0.0, renderEditable.offset.pixels - _dragStartViewportOffset);
-    final double effectiveScrollPosition = _scrollPosition - _dragStartScrollOffset;
-    final bool scrollingOnVerticalAxis = _scrollDirection == AxisDirection.up || _scrollDirection == AxisDirection.down;
-    final Offset scrollableOffset = Offset(
-      !scrollingOnVerticalAxis ? effectiveScrollPosition : 0.0,
-      scrollingOnVerticalAxis ? effectiveScrollPosition : 0.0,
-    );
+    final Offset scrollableOffset = switch (axisDirectionToAxis(_scrollDirection ?? AxisDirection.left)) {
+      Axis.horizontal => Offset(_scrollPosition - _dragStartScrollOffset, 0),
+      Axis.vertical   => Offset(0, _scrollPosition - _dragStartScrollOffset),
+    };
     renderEditable.selectWordsInRange(
       from: details.globalPosition - details.offsetFromOrigin - editableOffset - scrollableOffset,
       to: details.globalPosition,
@@ -150,6 +153,9 @@ class _SelectableTextSelectionGestureDetectorBuilder extends TextSelectionGestur
 }
 
 /// A run of selectable text with a single style.
+///
+/// Consider using [SelectionArea] or [SelectableRegion] instead, which enable
+/// selection on a widget subtree, including but not limited to [Text] widgets.
 ///
 /// The [SelectableText] widget displays a string of text with a single style.
 /// The string might break across multiple lines or might all be displayed on
@@ -202,10 +208,20 @@ class _SelectableTextSelectionGestureDetectorBuilder extends TextSelectionGestur
 /// To make [SelectableText] react to touch events, use callback [onTap] to achieve
 /// the desired behavior.
 ///
+/// ## Scrolling Considerations
+///
+/// If this [SelectableText] is not a descendant of [Scaffold] and is being used
+/// within a [Scrollable] or nested [Scrollable]s, consider placing a
+/// [ScrollNotificationObserver] above the root [Scrollable] that contains this
+/// [SelectableText] to ensure proper scroll coordination for [SelectableText]
+/// and its components like [TextSelectionOverlay].
+///
 /// See also:
 ///
 ///  * [Text], which is the non selectable version of this widget.
 ///  * [TextField], which is the editable version of this widget.
+///  * [SelectionArea], which enables the selection of multiple [Text] widgets
+///    and of other widgets.
 class SelectableText extends StatefulWidget {
   /// Creates a selectable text widget.
   ///
@@ -494,15 +510,13 @@ class SelectableText extends StatefulWidget {
     );
   }
 
-  /// {@macro flutter.widgets.magnifier.TextMagnifierConfiguration.intro}
-  ///
-  /// {@macro flutter.widgets.magnifier.intro}
-  ///
-  /// {@macro flutter.widgets.magnifier.TextMagnifierConfiguration.details}
+  /// The configuration for the magnifier used when the text is selected.
   ///
   /// By default, builds a [CupertinoTextMagnifier] on iOS and [TextMagnifier]
-  /// on Android, and builds nothing on all other platforms. If it is desired to
-  /// suppress the magnifier, consider passing [TextMagnifierConfiguration.disabled].
+  /// on Android, and builds nothing on all other platforms. To suppress the
+  /// magnifier, consider passing [TextMagnifierConfiguration.disabled].
+  ///
+  /// {@macro flutter.widgets.magnifier.intro}
   final TextMagnifierConfiguration? magnifierConfiguration;
 
   @override

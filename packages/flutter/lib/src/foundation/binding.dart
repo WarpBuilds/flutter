@@ -2,11 +2,21 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+/// @docImport 'dart:convert';
+/// @docImport 'dart:ui';
+///
+/// @docImport 'package:flutter/rendering.dart';
+/// @docImport 'package:flutter/scheduler.dart';
+/// @docImport 'package:flutter/services.dart';
+/// @docImport 'package:flutter/widgets.dart';
+/// @docImport 'package:flutter_test/flutter_test.dart';
+library;
+
 import 'dart:async';
 import 'dart:convert' show json;
 import 'dart:developer' as developer;
 import 'dart:io' show exit;
-import 'dart:ui' as ui show Brightness, PlatformDispatcher, SingletonFlutterWindow, window; // ignore: deprecated_member_use
+import 'dart:ui' as ui show Brightness, PlatformDispatcher, SingletonFlutterWindow, window;
 
 // Before adding any more dart:ui imports, please read the README.
 
@@ -22,7 +32,7 @@ import 'print.dart';
 import 'service_extensions.dart';
 import 'timeline.dart';
 
-export 'dart:ui' show PlatformDispatcher, SingletonFlutterWindow, clampDouble; // ignore: deprecated_member_use
+export 'dart:ui' show PlatformDispatcher, SingletonFlutterWindow, clampDouble;
 
 export 'basic_types.dart' show AsyncCallback, AsyncValueGetter, AsyncValueSetter;
 
