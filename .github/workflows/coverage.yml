@@ -17,14 +17,14 @@ permissions: read-all
 jobs:
   build:
     name: coverage
-    runs-on: warp-ubuntu-latest-x64-16x
+    runs-on: warp-ubuntu-latest-x64-4x
     # if: ${{ github.repository == 'flutter/flutter' }}
     steps:
       - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332
       - name: ./bin/flutter test --coverage
         run: pushd packages/flutter;../../bin/flutter test --coverage -j 1;popd
-      - name: upload coverage
-        uses: codecov/codecov-action@125fc84a9a348dbcf27191600683ec096ec9021c
-        with:
-          files: packages/flutter/coverage/lcov.info
-          verbose: true
+      # - name: upload coverage
+      #   uses: codecov/codecov-action@125fc84a9a348dbcf27191600683ec096ec9021c
+      #   with:
+      #     files: packages/flutter/coverage/lcov.info
+      #     verbose: true
